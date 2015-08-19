@@ -2,11 +2,12 @@
 
 The purpose of this project is:
 
+* provide an API that hashes bytes, not bits
 * provide a simple __single-file__ reference implementation of SHA-3 message digest algorithm, as defined in the [FIPS 202][fips202_standard] standard;
 * implement the hashing API that employs the __IUF__ paradigm (or `Init`, `Update`, `Finalize` style).
 * answer the design questions, such as:
   * what does the state for IUF look like?
-  * what is the incremental cost of adding e.g. SHA2-384 to a SHA3-256 implementation?
+  * what is the incremental cost of adding e.g. SHA3-384 to a SHA3-256 implementation?
 
 The implementation is written in C and uses `uint64_t` types to manage the state. The code will compile and run on 64-bit and 32-bit architectures (`gcc` and `gcc -m32` on `x86_64` were tested).
 
