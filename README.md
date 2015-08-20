@@ -3,10 +3,11 @@
 The purpose of this project is:
 
 * provide an API that hashes bytes, not bits
-* provide a simple __single-file__ reference implementation of SHA-3 message digest algorithm, as defined in the [FIPS 202][fips202_standard] standard;
+* provide a simple __single-file__ reference implementation of a SHA-3 message digest algorithm, as defined in the [FIPS 202][fips202_standard] standard;
 * implement the hashing API that employs the __IUF__ paradigm (or `Init`, `Update`, `Finalize` style).
 * answer the design questions, such as:
   * what does the state for IUF look like?
+  * how small can the state be (224 bytes on a 64-bit system for a unified SHA-3 algorithm)
   * what is the incremental cost of adding e.g. SHA3-384 to a SHA3-256 implementation?
 
 The implementation is written in C and uses `uint64_t` types to manage the state. The code will compile and run on 64-bit and 32-bit architectures (`gcc` and `gcc -m32` on `x86_64` were tested).
@@ -61,17 +62,17 @@ or
 
 ## API
 
-* the same `sha3_context` object type is used for SHA3-256, SHA3-384, or SHA3-512 contexts;
-* the hash algorithm used is determined by `sha3_InitX`, e.g. `sha3_Init256`, `sha3_Init384`, or `sha3_Init512` call;
+* the same `sha3_context` object maintains the state for SHA3-256, SHA3-384, or SHA3-512 algorithm;
+* the hash algorithm used is determined by how the context was initialized with `sha3_InitX`, e.g. `sha3_Init256`, `sha3_Init384`, or `sha3_Init512` call;
 * `sha3_Update` and `sha3_Finalize` are the same for regardless the type of the algorithm (`X`);
 * the buffer returned by `sha3_Finalize` will have `X` bits of hash;
 * `sha3_InitX` works also as Reset or Free (zeroization) of the hash context.
 
-See `sha3.c` for details.
+See [`sha3.c`](sha3.c) for details.
 
 ## Notes
 
 SHA3-224 is not supported, but can easily be added.
 
-Care was exercised to support the Microsoft Visual Studio compiler (under `_MSC_VER`), but this build target was not tested.
+The code was written to work with the Microsoft Visual Studio compiler (under `_MSC_VER`), but this build target was not tested.
 
