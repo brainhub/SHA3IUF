@@ -76,3 +76,5 @@ SHA3-224 is not supported, but can easily be added.
 
 The code was written to work with the Microsoft Visual Studio compiler (under `_MSC_VER`), but this build target was not tested.
 
+This project was created to support [SHA3 in OpenPGP](https://tools.ietf.org/html/draft-jivsov-openpgp-sha3) work, but it applies to other protocols and formats, e.g. TLS.
+
