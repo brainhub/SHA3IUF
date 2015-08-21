@@ -1,4 +1,4 @@
-# A single-file C implementation of SHA-3 with IUF API
+# A single-file C implementation of SHA-3 with Init/Update/Finalize API
 
 The purpose of this project is:
 
