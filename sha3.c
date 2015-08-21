@@ -289,7 +289,7 @@ sha3_Finalize(void *priv)
             SHA3_CONST(0x8000000000000000UL);
     keccakf(ctx->s);
 
-    /* Return first bytes of the ctx->s This conversion is not needed for
+    /* Return first bytes of the ctx->s. This conversion is not needed for
      * little-endian platforms e.g. wrap with #if !defined(__BYTE_ORDER__)
      * || !defined(__ORDER_LITTLE_ENDIAN__) || \
      * __BYTE_ORDER__!=__ORDER_LITTLE_ENDIAN__ ... the conversion below ...
@@ -325,6 +325,7 @@ sha3_Finalize(void *priv)
  * http://csrc.nist.gov/groups/ST/toolkit/examples.html
  *
  * SHA3-256:
+ *   http://csrc.nist.gov/groups/ST/toolkit/documents/Examples/SHA3-256_Msg0.pdf
  *   http://csrc.nist.gov/groups/ST/toolkit/documents/Examples/SHA3-256_1600.pdf
  * SHA3-384: 
  *   http://csrc.nist.gov/groups/ST/toolkit/documents/Examples/SHA3-384_1600.pdf 
@@ -365,6 +366,12 @@ main()
 
 #ifndef SHA3_USE_KECCAK
     /* [FIPS 202] KAT follow */
+    const static uint8_t sha3_256_empty[256 / 8] = {
+        0xa7, 0xff, 0xc6, 0xf8, 0xbf, 0x1e, 0xd7, 0x66,
+	0x51, 0xc1, 0x47, 0x56, 0xa0, 0x61, 0xd6, 0x62,
+	0xf5, 0x80, 0xff, 0x4d, 0xe4, 0x3b, 0x49, 0xfa, 
+	0x82, 0xd8, 0x0a, 0x4b, 0x80, 0xf8, 0x43, 0x4a
+    };
     const static uint8_t sha3_256_0xa3_200_times[256 / 8] = {
         0x79, 0xf3, 0x8a, 0xde, 0xc5, 0xc2, 0x03, 0x07,
         0xa9, 0x8e, 0xf7, 0x6e, 0x83, 0x24, 0xaf, 0xbf,
@@ -477,6 +484,14 @@ main()
         return 15;
     }
 #else                           /* SHA3 testing begins */
+
+    /* SHA-256 on an empty buffer */
+    sha3_Init256(&c);
+    hash = sha3_Finalize(&c);
+    if(memcmp(sha3_256_empty, hash, sizeof(sha3_256_empty)) != 0) {
+        printf("SHA3-256() doesn't match known answer\n");
+        return 1;
+    }
 
     /* SHA3-256 as a single buffer. [FIPS 202] */
     sha3_Init256(&c);
