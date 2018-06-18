@@ -66,7 +66,7 @@ or
     $ gcc -m32 -Wall sha3.c sha3test.c -o _ && ./_
     SHA3-256, SHA3-384, SHA3-512 tests passed OK
 
-There is also sha3sum test program that takes following parameters:
+There is also `sha3sum` test program that takes following parameters:
 
     sha3sum 256|384|512 file_path
 
@@ -76,7 +76,7 @@ For example:
     $ gcc -Wall sha3.c sha3sum.c -o sha3sum && ./sha3sum 256 empty.txt
     a7ffc6f8bf1ed76651c14756a061d662f580ff4de43b49fa82d80a4b80f8434a  empty.txt
 
-Compare with Linux sha3sum:
+Compare with Linux `sha3sum`:
 
     $ sha3sum -a 256 empty.txt
     a7ffc6f8bf1ed76651c14756a061d662f580ff4de43b49fa82d80a4b80f8434a  empty.txt
@@ -93,7 +93,7 @@ See [`sha3.c`](sha3.c) for details.
 
 ## Credits
 
-Thanks to @ralight for moving the test code into separate sha3test.c
+Thanks to @ralight for moving the test code into separate `sha3test.c`
 
 ## Notes
 
