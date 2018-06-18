@@ -54,7 +54,7 @@ The `hash` points to the same `256/8=32` bytes in both cases.
 
     $ make
 
-See Makefile for details. See also below for specific examples.
+See `Makefile` for details. See also below for specific examples.
 
 ## Self-tests
 
