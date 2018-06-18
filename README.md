@@ -10,7 +10,7 @@ The purpose of this project is:
   * how small can the state be (224 bytes on a 64-bit system for a unified SHA-3 algorithm)
   * what is the incremental cost of adding e.g. SHA3-384 to a SHA3-256 implementation?
 
-The implementation is written in C and uses `uint64_t` types to manage the state. The code will compile and run on 64-bit and 32-bit architectures (`gcc` and `gcc -m32` on `x86_64` were tested).
+The implementation is written in C and uses `uint64_t` types to manage the SHA-3 state. The code will compile and run on 64-bit and 32-bit architectures (`gcc` and `gcc -m32` on `x86_64` were tested).
 
 [fips202_standard]: http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.202.pdf "FIPS 202 standard"
 
@@ -50,6 +50,12 @@ Alternatively, IUF hashing:
 
 The `hash` points to the same `256/8=32` bytes in both cases.
 
+## Building
+
+    $ make
+
+See Makefile for details. See also below for specific examples.
+
 ## Self-tests
 
     $ gcc -Wall sha3.c sha3test.c -o _ && ./_
@@ -57,8 +63,23 @@ The `hash` points to the same `256/8=32` bytes in both cases.
 
 or 
 
-    $ gcc -m32 Wall sha3.c sha3test.c -o _ && ./_
+    $ gcc -m32 -Wall sha3.c sha3test.c -o _ && ./_
     SHA3-256, SHA3-384, SHA3-512 tests passed OK
+
+There is also sha3sum test program that takes following parameters:
+
+    sha3sum 256|384|512 file_path
+
+For example:
+
+    $ touch empty.txt
+    $ gcc -Wall sha3.c sha3sum.c -o sha3sum && ./sha3sum 256 empty.txt
+    a7ffc6f8bf1ed76651c14756a061d662f580ff4de43b49fa82d80a4b80f8434a  empty.txt
+
+Compare with Linux sha3sum:
+
+    $ sha3sum -a 256 empty.txt
+    a7ffc6f8bf1ed76651c14756a061d662f580ff4de43b49fa82d80a4b80f8434a  empty.txt
 
 ## API
 
@@ -69,6 +90,10 @@ or
 * `sha3_InitX` works also as Reset or Free (zeroization) of the hash context.
 
 See [`sha3.c`](sha3.c) for details.
+
+## Credits
+
+Thanks to @ralight for moving the test code into separate sha3test.c
 
 ## Notes
 

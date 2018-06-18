@@ -6,7 +6,7 @@ LDFLAGS=
 
 .PHONY : all test clean 
 
-all: sha3test
+all: sha3test sha3sum
 
 sha3.o: sha3.c
 	$(CC) -c $(CFLAGS) -o $@ $<
