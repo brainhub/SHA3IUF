@@ -271,8 +271,8 @@ sha3_Finalize(void *priv)
 
     /* Return first bytes of the ctx->s. This conversion is not needed for
      * little-endian platforms e.g. wrap with #if !defined(__BYTE_ORDER__)
-     * || !defined(__ORDER_LITTLE_ENDIAN__) || \
-     * __BYTE_ORDER__!=__ORDER_LITTLE_ENDIAN__ ... the conversion below ...
+     * || !defined(__ORDER_LITTLE_ENDIAN__) || __BYTE_ORDER__!=__ORDER_LITTLE_ENDIAN__ 
+     *    ... the conversion below ...
      * #endif */
     {
         unsigned i;
