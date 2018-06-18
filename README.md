@@ -52,12 +52,12 @@ The `hash` points to the same `256/8=32` bytes in both cases.
 
 ## Self-tests
 
-    $ gcc -Wall sha3.c -o _ && ./_
+    $ gcc -Wall sha3.c sha3test.c -o _ && ./_
     SHA3-256, SHA3-384, SHA3-512 tests passed OK
 
 or 
 
-    $ gcc -m32 Wall sha3.c -o _ && ./_
+    $ gcc -m32 Wall sha3.c sha3test.c -o _ && ./_
     SHA3-256, SHA3-384, SHA3-512 tests passed OK
 
 ## API
