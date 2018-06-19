@@ -87,9 +87,9 @@ Compare with Linux `sha3sum`:
 * the hash algorithm used is determined by how the context was initialized with `sha3_InitX`, e.g. `sha3_Init256`, `sha3_Init384`, or `sha3_Init512` call;
 * `sha3_Update` and `sha3_Finalize` are the same for regardless the type of the algorithm (`X`);
 * the buffer returned by `sha3_Finalize` will have `X` bits of hash;
-* `sha3_InitX` works also as Reset or Free (zeroization) of the hash context.
+* `sha3_InitX` also works as Reset (zeroization) of the hash context; no Free function is needed;
 
-See [`sha3.c`](sha3.c) for details.
+See [`sha3.h`](sha3.h) for the exact interface.
 
 ## Credits
 
