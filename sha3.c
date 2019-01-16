@@ -31,14 +31,12 @@
 #define SHA3_TRACE_BUF(format, buf, l, args...)
 #endif
 
-//#define SHA3_USE_KECCAK
 /* 
- * Define SHA3_USE_KECCAK to run "pure" Keccak, as opposed to SHA3.
- * The tests that this macro enables use the input and output from [Keccak]
- * (see the reference below). The used test vectors aren't correct for SHA3, 
- * however, they are helpful to verify the implementation.
- * SHA3_USE_KECCAK only changes one line of code in Finalize.
+ * This flag is used to configure "pure" Keccak, as opposed to NIST SHA3.
  */
+#define SHA3_USE_KECCAK_FLAG 0x80000000
+#define SHA3_CW(x) ((x) & (~SHA3_USE_KECCAK_FLAG))
+
 
 #if defined(_MSC_VER)
 #define SHA3_CONST(x) x
@@ -148,6 +146,14 @@ sha3_Init512(void *priv)
 }
 
 void
+sha3_UseKeccak(void *priv)
+{
+    sha3_context *ctx = (sha3_context *) priv;
+    ctx->capacityWords |= SHA3_USE_KECCAK_FLAG;
+}
+
+
+void
 sha3_Update(void *priv, void const *bufIn, size_t len)
 {
     sha3_context *ctx = (sha3_context *) priv;
@@ -190,7 +196,7 @@ sha3_Update(void *priv, void const *bufIn, size_t len)
         ctx->byteIndex = 0;
         ctx->saved = 0;
         if(++ctx->wordIndex ==
-                (SHA3_KECCAK_SPONGE_WORDS - ctx->capacityWords)) {
+                (SHA3_KECCAK_SPONGE_WORDS - SHA3_CW(ctx->capacityWords))) {
             keccakf(ctx->s);
             ctx->wordIndex = 0;
         }
@@ -219,7 +225,7 @@ sha3_Update(void *priv, void const *bufIn, size_t len)
 #endif
         ctx->s[ctx->wordIndex] ^= t;
         if(++ctx->wordIndex ==
-                (SHA3_KECCAK_SPONGE_WORDS - ctx->capacityWords)) {
+                (SHA3_KECCAK_SPONGE_WORDS - SHA3_CW(ctx->capacityWords))) {
             keccakf(ctx->s);
             ctx->wordIndex = 0;
         }
@@ -253,19 +259,20 @@ sha3_Finalize(void *priv)
      * Overall, we feed 0, then 1, and finally 1 to start padding. Without
      * M || 01, we would simply use 1 to start padding. */
 
-#ifndef SHA3_USE_KECCAK
-    /* SHA3 version */
-    ctx->s[ctx->wordIndex] ^=
-            (ctx->saved ^ ((uint64_t) ((uint64_t) (0x02 | (1 << 2)) <<
-                            ((ctx->byteIndex) * 8))));
-#else
-    /* For testing the "pure" Keccak version */
-    ctx->s[ctx->wordIndex] ^=
-            (ctx->saved ^ ((uint64_t) ((uint64_t) 1 << (ctx->byteIndex *
-                                    8))));
-#endif
+    uint64_t t;
 
-    ctx->s[SHA3_KECCAK_SPONGE_WORDS - ctx->capacityWords - 1] ^=
+    if( ctx->capacityWords & SHA3_USE_KECCAK_FLAG ) {
+        /* Keccak version */
+        t = (uint64_t)(((uint64_t) 1) << (ctx->byteIndex * 8));
+    }
+    else {
+        /* SHA3 version */
+        t = (uint64_t)(((uint64_t)(0x02 | (1 << 2))) << ((ctx->byteIndex) * 8));
+    }
+
+    ctx->s[ctx->wordIndex] ^= ctx->saved ^ t;
+
+    ctx->s[SHA3_KECCAK_SPONGE_WORDS - SHA3_CW(ctx->capacityWords) - 1] ^=
             SHA3_CONST(0x8000000000000000UL);
     keccakf(ctx->s);
 

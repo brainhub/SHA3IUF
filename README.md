@@ -3,7 +3,8 @@
 The purpose of this project is:
 
 * provide an API that hashes bytes, not bits
-* provide a simple __single-file__ reference implementation of a SHA-3 message digest algorithm, as defined in the [FIPS 202][fips202_standard] standard;
+* provide a simple reference implementation of a SHA-3 message digest algorithm, as defined in the [FIPS 202][fips202_standard] standard
+* kikewise, for the original Keccak algorithm that's adopted in ecosystems like Etherium blockchain
 * implement the hashing API that employs the __IUF__ paradigm (or `Init`, `Update`, `Finalize` style).
 * answer the design questions, such as:
   * what does the state for IUF look like?
@@ -50,6 +51,10 @@ Alternatively, IUF hashing:
 
 The `hash` points to the same `256/8=32` bytes in both cases.
 
+## How to use Keccak version
+
+Call `sha3_UseKeccak` immediately after `sha3_InitX` or no later than `sha3_Finalize`. This change cannot be undone for the given hash context.
+
 ## Building
 
     $ make
@@ -58,17 +63,23 @@ See `Makefile` for details. See also below for specific examples.
 
 ## Self-tests
 
-    $ gcc -Wall sha3.c sha3test.c -o _ && ./_
+    $ make test
+    Keccak-256 tests passed OK
     SHA3-256, SHA3-384, SHA3-512 tests passed OK
 
 or 
 
-    $ gcc -m32 -Wall sha3.c sha3test.c -o _ && ./_
+    $ make CFLAGS=-m32 LDFLAGS=-m32 test
+    Keccak-256 tests passed OK
     SHA3-256, SHA3-384, SHA3-512 tests passed OK
 
 There is also `sha3sum` test program that takes following parameters:
 
-    sha3sum 256|384|512 file_path
+    sha3sum 256|384|512 file_path 
+
+or 
+
+    sha3sum 256|384|512 -k file_path 
 
 For example:
 

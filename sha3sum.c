@@ -25,7 +25,7 @@
 #include "sha3.h"
 
 static void help(const char *argv0) {
-    printf("To call: %s 256|384|512 file_path.\n", argv0);
+    printf("To call: %s 256|384|512 [-k] file_path.\n", argv0);
 }
 
 static void byte_to_hex(uint8_t b, char s[23]) {
@@ -54,8 +54,9 @@ int main(int argc, char *argv[])
     struct stat st;
     void *p;
     unsigned i;
+    unsigned use_keccak = 0;
 
-    if( argc != 3 ) {
+    if( argc != 3 && argc != 4 ) {
 	    help(argv[0]);
 	    return 1;
     }
@@ -72,6 +73,12 @@ int main(int argc, char *argv[])
     }
 
     file_path = argv[2];
+
+    if( argc == 4 && file_path[0] == '-' && file_path[1] == 'k' )  {
+        use_keccak = 1;
+        file_path = argv[3];
+    }
+
     if( access(file_path, R_OK)!=0 ) {
 	    printf("Cannot read file '%s'", file_path);
 	    return 2;
@@ -108,6 +115,9 @@ int main(int argc, char *argv[])
 		break;
     }
 
+    if( use_keccak ) {
+        sha3_UseKeccak(&c);
+    }
     sha3_Update(&c, p, st.st_size);
     hash = sha3_Finalize(&c);
 

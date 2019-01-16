@@ -71,7 +71,6 @@ main()
     unsigned i;
     const uint8_t c1 = 0xa3;
 
-#ifndef SHA3_USE_KECCAK
     /* [FIPS 202] KAT follow */
     const static uint8_t sha3_256_empty[256 / 8] = {
         0xa7, 0xff, 0xc6, 0xf8, 0xbf, 0x1e, 0xd7, 0x66,
@@ -103,14 +102,13 @@ main()
         0xe5, 0x89, 0xc5, 0x1c, 0xa1, 0xa4, 0xa8, 0x41,
         0x6d, 0xf6, 0x54, 0x5a, 0x1c, 0xe8, 0xba, 0x00
     };
-#endif
 
     memset(buf, c1, sizeof(buf));
 
-#ifdef SHA3_USE_KECCAK          /* run tests against "pure" Keccak
-                                 * algorithm; from [Keccak] */
+    /* ---- "pure" Keccak algorithm begins; from [Keccak] ----- */
 
     sha3_Init256(&c);
+    sha3_UseKeccak(&c);
     sha3_Update(&c, "\xcc", 1);
     hash = sha3_Finalize(&c);
     if(memcmp(hash, "\xee\xad\x6d\xbf\xc7\x34\x0a\x56"
@@ -123,6 +121,7 @@ main()
     }
 
     sha3_Init256(&c);
+    sha3_UseKeccak(&c);
     sha3_Update(&c, "\x41\xfb", 2);
     hash = sha3_Finalize(&c);
     if(memcmp(hash, "\xa8\xea\xce\xda\x4d\x47\xb3\x28"
@@ -135,6 +134,7 @@ main()
     }
 
     sha3_Init256(&c);
+    sha3_UseKeccak(&c);
     sha3_Update(&c,
             "\x52\xa6\x08\xab\x21\xcc\xdd\x8a"
             "\x44\x57\xa5\x7e\xde\x78\x21\x76", 128 / 8);
@@ -149,6 +149,7 @@ main()
     }
 
     sha3_Init256(&c);
+    sha3_UseKeccak(&c);
     sha3_Update(&c,
             "\x43\x3c\x53\x03\x13\x16\x24\xc0"
             "\x02\x1d\x86\x8a\x30\x82\x54\x75"
@@ -176,6 +177,7 @@ main()
      * [Keccak] */
     i = 16777216;
     sha3_Init256(&c);
+    sha3_UseKeccak(&c);
     while (i--) {
         sha3_Update(&c,
                 "abcdefghbcdefghicdefghijdefghijk"
@@ -190,7 +192,10 @@ main()
                 "doesn't match known answer\n");
         return 15;
     }
-#else                           /* SHA3 testing begins */
+
+    printf("Keccak-256 tests passed OK\n");
+
+    /* ----- SHA3 testing begins ----- */
 
     /* SHA-256 on an empty buffer */
     sha3_Init256(&c);
@@ -340,7 +345,6 @@ main()
                 "doesn't match known answer (200 steps)\n");
         return 10;
     }
-#endif
 
     printf("SHA3-256, SHA3-384, SHA3-512 tests passed OK\n");
 
