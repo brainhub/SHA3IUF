@@ -51,9 +51,14 @@ Alternatively, IUF hashing:
 
 The `hash` points to the same `256/8=32` bytes in both cases.
 
+There is also a single-call hashing API:
+
+    sha3_HashBuffer(256, SHA3_FLAGS_KECCAK, "abc", 3, out, sizeof(out));
+    // out contains 256 bits of Keccak256, or less if sizeof(out)<32
+
 ## How to use Keccak version
 
-Call `sha3_UseKeccak` immediately after `sha3_InitX` or no later than `sha3_Finalize`. This change cannot be undone for the given hash context.
+Call `sha3_SetFlags(&c, SHA3_FLAGS_KECCAK)` immediately after `sha3_InitX` or no later than `sha3_Finalize`. This change cannot be undone for the given hash context.
 
 ## Building
 

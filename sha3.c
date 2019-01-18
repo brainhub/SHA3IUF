@@ -121,35 +121,41 @@ keccakf(uint64_t s[25])
 /* *************************** Public Inteface ************************ */
 
 /* For Init or Reset call these: */
+sha3_return_t
+sha3_Init(void *priv, unsigned bitSize) {
+    sha3_context *ctx = (sha3_context *) priv;
+    if( bitSize != 256 && bitSize != 384 && bitSize != 512 )
+        return SHA3_RETURN_BAD_PARAMS;
+    memset(ctx, 0, sizeof(*ctx));
+    ctx->capacityWords = 2 * bitSize / (8 * sizeof(uint64_t));
+    return SHA3_RETURN_OK;
+}
+
 void
 sha3_Init256(void *priv)
 {
-    sha3_context *ctx = (sha3_context *) priv;
-    memset(ctx, 0, sizeof(*ctx));
-    ctx->capacityWords = 2 * 256 / (8 * sizeof(uint64_t));
+    sha3_Init(priv, 256);
 }
 
 void
 sha3_Init384(void *priv)
 {
-    sha3_context *ctx = (sha3_context *) priv;
-    memset(ctx, 0, sizeof(*ctx));
-    ctx->capacityWords = 2 * 384 / (8 * sizeof(uint64_t));
+    sha3_Init(priv, 384);
 }
 
 void
 sha3_Init512(void *priv)
 {
-    sha3_context *ctx = (sha3_context *) priv;
-    memset(ctx, 0, sizeof(*ctx));
-    ctx->capacityWords = 2 * 512 / (8 * sizeof(uint64_t));
+    sha3_Init(priv, 512);
 }
 
-void
-sha3_UseKeccak(void *priv)
+enum SHA3_FLAGS
+sha3_SetFlags(void *priv, enum SHA3_FLAGS flags)
 {
     sha3_context *ctx = (sha3_context *) priv;
-    ctx->capacityWords |= SHA3_USE_KECCAK_FLAG;
+    flags &= SHA3_FLAGS_KECCAK;
+    ctx->capacityWords |= (flags == SHA3_FLAGS_KECCAK ? SHA3_USE_KECCAK_FLAG : 0);
+    return flags;
 }
 
 
@@ -300,4 +306,23 @@ sha3_Finalize(void *priv)
     SHA3_TRACE_BUF("Hash: (first 32 bytes)", ctx->sb, 256 / 8);
 
     return (ctx->sb);
+}
+
+sha3_return_t sha3_HashBuffer( unsigned bitSize, enum SHA3_FLAGS flags, const void *in, unsigned inBytes, void *out, unsigned outBytes ) {
+    sha3_return_t err;
+    sha3_context c;
+
+    err = sha3_Init(&c, bitSize);
+    if( err != SHA3_RETURN_OK )
+        return err;
+    if( sha3_SetFlags(&c, flags) != flags ) {
+        return SHA3_RETURN_BAD_PARAMS;
+    }
+    sha3_Update(&c, in, inBytes);
+    const void *h = sha3_Finalize(&c);
+
+    if(outBytes > bitSize/8)
+        outBytes = bitSize/8;
+    memcpy(out, h, outBytes);
+    return SHA3_RETURN_OK;
 }

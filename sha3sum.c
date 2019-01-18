@@ -116,7 +116,11 @@ int main(int argc, char *argv[])
     }
 
     if( use_keccak ) {
-        sha3_UseKeccak(&c);
+        enum SHA3_FLAGS flags2 = sha3_SetFlags(&c, SHA3_FLAGS_KECCAK);
+        if( flags2 != SHA3_FLAGS_KECCAK )  {
+	    printf("Failed to set Keccak mode");
+            return 2;
+        }
     }
     sha3_Update(&c, p, st.st_size);
     hash = sha3_Finalize(&c);

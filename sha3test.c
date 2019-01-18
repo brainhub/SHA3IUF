@@ -107,8 +107,19 @@ main()
 
     /* ---- "pure" Keccak algorithm begins; from [Keccak] ----- */
 
+    sha3_HashBuffer(256, SHA3_FLAGS_KECCAK, "abc", 3, buf, sizeof(buf));
+    if(memcmp(buf, "\x4e\x03\x65\x7a\xea\x45\xa9\x4f"
+                   "\xc7\xd4\x7b\xa8\x26\xc8\xd6\x67"
+                   "\xc0\xd1\xe6\xe3\x3a\x64\xa0\x36"
+                   "\xec\x44\xf5\x8f\xa1\x2d\x6c\x45", 256 / 8) != 0) {
+        printf("SHA3-256(abc) "
+                "doesn't match known answer (single buffer)\n");
+        return 10;
+    }
+
+
     sha3_Init256(&c);
-    sha3_UseKeccak(&c);
+    sha3_SetFlags(&c, SHA3_FLAGS_KECCAK);
     sha3_Update(&c, "\xcc", 1);
     hash = sha3_Finalize(&c);
     if(memcmp(hash, "\xee\xad\x6d\xbf\xc7\x34\x0a\x56"
@@ -121,7 +132,7 @@ main()
     }
 
     sha3_Init256(&c);
-    sha3_UseKeccak(&c);
+    sha3_SetFlags(&c, SHA3_FLAGS_KECCAK);
     sha3_Update(&c, "\x41\xfb", 2);
     hash = sha3_Finalize(&c);
     if(memcmp(hash, "\xa8\xea\xce\xda\x4d\x47\xb3\x28"
@@ -134,7 +145,7 @@ main()
     }
 
     sha3_Init256(&c);
-    sha3_UseKeccak(&c);
+    sha3_SetFlags(&c, SHA3_FLAGS_KECCAK);
     sha3_Update(&c,
             "\x52\xa6\x08\xab\x21\xcc\xdd\x8a"
             "\x44\x57\xa5\x7e\xde\x78\x21\x76", 128 / 8);
@@ -149,7 +160,7 @@ main()
     }
 
     sha3_Init256(&c);
-    sha3_UseKeccak(&c);
+    sha3_SetFlags(&c, SHA3_FLAGS_KECCAK);
     sha3_Update(&c,
             "\x43\x3c\x53\x03\x13\x16\x24\xc0"
             "\x02\x1d\x86\x8a\x30\x82\x54\x75"
@@ -177,7 +188,7 @@ main()
      * [Keccak] */
     i = 16777216;
     sha3_Init256(&c);
-    sha3_UseKeccak(&c);
+    sha3_SetFlags(&c, SHA3_FLAGS_KECCAK);
     while (i--) {
         sha3_Update(&c,
                 "abcdefghbcdefghicdefghijdefghijk"
@@ -203,6 +214,17 @@ main()
     if(memcmp(sha3_256_empty, hash, sizeof(sha3_256_empty)) != 0) {
         printf("SHA3-256() doesn't match known answer\n");
         return 1;
+    }
+
+    sha3_HashBuffer(256, SHA3_FLAGS_NONE, "abc", 3, buf, sizeof(buf));
+    if(memcmp(buf, 
+                    "\x3a\x98\x5d\xa7\x4f\xe2\x25\xb2"
+                    "\x04\x5c\x17\x2d\x6b\xd3\x90\xbd"
+                    "\x85\x5f\x08\x6e\x3e\x9d\x52\x5b"
+                    "\x46\xbf\xe2\x45\x11\x43\x15\x32", 256 / 8) != 0) {
+        printf("SHA3-256(abc) "
+                "doesn't match known answer (single buffer)\n");
+        return 10;
     }
 
     /* SHA3-256 as a single buffer. [FIPS 202] */
