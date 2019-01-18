@@ -21,6 +21,8 @@ This work is in public domain.
 
 I would appreciate any attribution to this work if you used the code or ideas. I thank you for this in advance.
 
+If I get to choose a license for this project, it will be something like a MIT or Apache 2.0 license. Please contact me if this is important/required for you.
+
 This is a clean-room implementation of IUF API for SHA3. The `keccakf()` is based on the code from [keccak.noekeon.org](http://keccak.noekeon.org/).
 
 1600-bit message hashing test vectors are [NIST test vectors](http://csrc.nist.gov/groups/ST/toolkit/examples.html).
