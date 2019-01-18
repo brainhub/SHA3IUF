@@ -1,4 +1,4 @@
-# A single-file C implementation of SHA-3 with Init/Update/Finalize API
+# A single-file C implementation of SHA-3 and Keccak with Init/Update/Finalize API
 
 The purpose of this project is:
 
