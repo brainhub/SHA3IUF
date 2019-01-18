@@ -4,8 +4,8 @@ The purpose of this project is:
 
 * provide an API that hashes bytes, not bits
 * provide a simple reference implementation of a SHA-3 message digest algorithm, as defined in the [FIPS 202][fips202_standard] standard
-* kikewise, for the original Keccak algorithm that's adopted in ecosystems like Etherium blockchain
-* implement the hashing API that employs the __IUF__ paradigm (or `Init`, `Update`, `Finalize` style).
+* assist developers in the [Etherium](https://www.ethereum.org/) blockchain ecosystem by providing the Keccak function used there
+* implement the hashing API that employs the __IUF__ paradigm (or `Init`, `Update`, `Finalize` style)
 * answer the design questions, such as:
   * what does the state for IUF look like?
   * how small can the state be (224 bytes on a 64-bit system for a unified SHA-3 algorithm)
@@ -77,11 +77,11 @@ There is also `sha3sum` test program that takes following parameters:
 
     sha3sum 256|384|512 file_path 
 
-or 
+or for Keccak version:
 
     sha3sum 256|384|512 -k file_path 
 
-For example:
+### SHA-3 / Linux sha3sum example.
 
     $ touch empty.txt
     $ gcc -Wall sha3.c sha3sum.c -o sha3sum && ./sha3sum 256 empty.txt
@@ -91,6 +91,17 @@ Compare with Linux `sha3sum`:
 
     $ sha3sum -a 256 empty.txt
     a7ffc6f8bf1ed76651c14756a061d662f580ff4de43b49fa82d80a4b80f8434a  empty.txt
+
+### Keccak256 / Solidity example.
+
+    $ echo -n "abc" > abc
+    $ sha3sum 256 -k abc
+    4e03657aea45a94fc7d47ba826c8d667c0d1e6e33a64a036ec44f58fa12d6c45  abc
+
+This corresponds to the result obtained in Solidity JavaScript test framework.
+
+     console.log(web3.utils.sha3('abc'));
+     // prints the above string with 0x in the front.
 
 ## API
 
