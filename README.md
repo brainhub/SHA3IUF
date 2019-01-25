@@ -88,7 +88,7 @@ or for Keccak version:
 
     sha3sum 256|384|512 -k file_path 
 
-### SHA-3 / Linux sha3sum example.
+### SHA-3 / Linux sha3sum example
 
     $ touch empty.txt
     $ gcc -Wall sha3.c sha3sum.c -o sha3sum && ./sha3sum 256 empty.txt
@@ -99,7 +99,7 @@ Compare with Linux `sha3sum`:
     $ sha3sum -a 256 empty.txt
     a7ffc6f8bf1ed76651c14756a061d662f580ff4de43b49fa82d80a4b80f8434a  empty.txt
 
-### Keccak256 / Solidity example.
+### Keccak256 / Solidity example
 
     $ echo -n "abc" > abc
     $ sha3sum 256 -k abc
@@ -108,7 +108,7 @@ Compare with Linux `sha3sum`:
 This corresponds to the result obtained in Solidity JavaScript test framework.
 
      console.log(web3.utils.sha3('abc'));
-     // prints the above string with 0x in the front.
+     // prints 0x4e03657aea45a94fc7d47ba826c8d667c0d1e6e33a64a036ec44f58fa12d6c45
 
 ## API
 
