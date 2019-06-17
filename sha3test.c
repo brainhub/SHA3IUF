@@ -103,8 +103,6 @@ main()
         0x6d, 0xf6, 0x54, 0x5a, 0x1c, 0xe8, 0xba, 0x00
     };
 
-    memset(buf, c1, sizeof(buf));
-
     /* ---- "pure" Keccak algorithm begins; from [Keccak] ----- */
 
     sha3_HashBuffer(256, SHA3_FLAGS_KECCAK, "abc", 3, buf, sizeof(buf));
@@ -226,6 +224,8 @@ main()
                 "doesn't match known answer (single buffer)\n");
         return 10;
     }
+
+    memset(buf, c1, sizeof(buf));       /* set to value c1 */
 
     /* SHA3-256 as a single buffer. [FIPS 202] */
     sha3_Init256(&c);
