@@ -17,11 +17,7 @@ The implementation is written in C and uses `uint64_t` types to manage the SHA-3
 
 ## License, prior work
 
-This work is in public domain. 
-
-I would appreciate any attribution to this work if you used the code or ideas. I thank you for this in advance.
-
-If I get to choose a license for this project, it will be something like a MIT or Apache 2.0 license. Please contact me if this is important/required for you.
+This work is licensed with a standard [MIT license](LICENSE). I appreciate, but do not require, any attribution to this work if you used the code or ideas. I thank you for this in advance.
 
 This is a clean-room implementation of IUF API for SHA3. The `keccakf()` is based on the code from [keccak.noekeon.org](http://keccak.noekeon.org/).
 
