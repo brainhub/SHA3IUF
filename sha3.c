@@ -23,13 +23,8 @@
 #include "sha3.h"
 
 #define SHA3_ASSERT( x )
-#if defined(_MSC_VER)
 #define SHA3_TRACE( format, ...)
-#define SHA3_TRACE_BUF( format, buf, l, ...)
-#else
-#define SHA3_TRACE(format, args...)
-#define SHA3_TRACE_BUF(format, buf, l, args...)
-#endif
+#define SHA3_TRACE_BUF(format, buf, l)
 
 /* 
  * This flag is used to configure "pure" Keccak, as opposed to NIST SHA3.
@@ -176,7 +171,7 @@ sha3_Update(void *priv, void const *bufIn, size_t len)
     SHA3_TRACE_BUF("called to update with:", buf, len);
 
     SHA3_ASSERT(ctx->byteIndex < 8);
-    SHA3_ASSERT(ctx->wordIndex < sizeof(ctx->s) / sizeof(ctx->s[0]));
+    SHA3_ASSERT(ctx->wordIndex < sizeof(ctx->u.s) / sizeof(ctx->u.s[0]));
 
     if(len < old_tail) {        /* have no complete word or haven't started 
                                  * the word yet */
@@ -197,13 +192,13 @@ sha3_Update(void *priv, void const *bufIn, size_t len)
             ctx->saved |= (uint64_t) (*(buf++)) << ((ctx->byteIndex++) * 8);
 
         /* now ready to add saved to the sponge */
-        ctx->s[ctx->wordIndex] ^= ctx->saved;
+        ctx->u.s[ctx->wordIndex] ^= ctx->saved;
         SHA3_ASSERT(ctx->byteIndex == 8);
         ctx->byteIndex = 0;
         ctx->saved = 0;
         if(++ctx->wordIndex ==
                 (SHA3_KECCAK_SPONGE_WORDS - SHA3_CW(ctx->capacityWords))) {
-            keccakf(ctx->s);
+            keccakf(ctx->u.s);
             ctx->wordIndex = 0;
         }
     }
@@ -229,10 +224,10 @@ sha3_Update(void *priv, void const *bufIn, size_t len)
 #if defined(__x86_64__ ) || defined(__i386__)
         SHA3_ASSERT(memcmp(&t, buf, 8) == 0);
 #endif
-        ctx->s[ctx->wordIndex] ^= t;
+        ctx->u.s[ctx->wordIndex] ^= t;
         if(++ctx->wordIndex ==
                 (SHA3_KECCAK_SPONGE_WORDS - SHA3_CW(ctx->capacityWords))) {
-            keccakf(ctx->s);
+            keccakf(ctx->u.s);
             ctx->wordIndex = 0;
         }
     }
@@ -276,11 +271,11 @@ sha3_Finalize(void *priv)
         t = (uint64_t)(((uint64_t)(0x02 | (1 << 2))) << ((ctx->byteIndex) * 8));
     }
 
-    ctx->s[ctx->wordIndex] ^= ctx->saved ^ t;
+    ctx->u.s[ctx->wordIndex] ^= ctx->saved ^ t;
 
-    ctx->s[SHA3_KECCAK_SPONGE_WORDS - SHA3_CW(ctx->capacityWords) - 1] ^=
+    ctx->u.s[SHA3_KECCAK_SPONGE_WORDS - SHA3_CW(ctx->capacityWords) - 1] ^=
             SHA3_CONST(0x8000000000000000UL);
-    keccakf(ctx->s);
+    keccakf(ctx->u.s);
 
     /* Return first bytes of the ctx->s. This conversion is not needed for
      * little-endian platforms e.g. wrap with #if !defined(__BYTE_ORDER__)
@@ -290,22 +285,22 @@ sha3_Finalize(void *priv)
     {
         unsigned i;
         for(i = 0; i < SHA3_KECCAK_SPONGE_WORDS; i++) {
-            const unsigned t1 = (uint32_t) ctx->s[i];
-            const unsigned t2 = (uint32_t) ((ctx->s[i] >> 16) >> 16);
-            ctx->sb[i * 8 + 0] = (uint8_t) (t1);
-            ctx->sb[i * 8 + 1] = (uint8_t) (t1 >> 8);
-            ctx->sb[i * 8 + 2] = (uint8_t) (t1 >> 16);
-            ctx->sb[i * 8 + 3] = (uint8_t) (t1 >> 24);
-            ctx->sb[i * 8 + 4] = (uint8_t) (t2);
-            ctx->sb[i * 8 + 5] = (uint8_t) (t2 >> 8);
-            ctx->sb[i * 8 + 6] = (uint8_t) (t2 >> 16);
-            ctx->sb[i * 8 + 7] = (uint8_t) (t2 >> 24);
+            const unsigned t1 = (uint32_t) ctx->u.s[i];
+            const unsigned t2 = (uint32_t) ((ctx->u.s[i] >> 16) >> 16);
+            ctx->u.sb[i * 8 + 0] = (uint8_t) (t1);
+            ctx->u.sb[i * 8 + 1] = (uint8_t) (t1 >> 8);
+            ctx->u.sb[i * 8 + 2] = (uint8_t) (t1 >> 16);
+            ctx->u.sb[i * 8 + 3] = (uint8_t) (t1 >> 24);
+            ctx->u.sb[i * 8 + 4] = (uint8_t) (t2);
+            ctx->u.sb[i * 8 + 5] = (uint8_t) (t2 >> 8);
+            ctx->u.sb[i * 8 + 6] = (uint8_t) (t2 >> 16);
+            ctx->u.sb[i * 8 + 7] = (uint8_t) (t2 >> 24);
         }
     }
 
-    SHA3_TRACE_BUF("Hash: (first 32 bytes)", ctx->sb, 256 / 8);
+    SHA3_TRACE_BUF("Hash: (first 32 bytes)", ctx->u.sb, 256 / 8);
 
-    return (ctx->sb);
+    return (ctx->u.sb);
 }
 
 sha3_return_t sha3_HashBuffer( unsigned bitSize, enum SHA3_FLAGS flags, const void *in, unsigned inBytes, void *out, unsigned outBytes ) {

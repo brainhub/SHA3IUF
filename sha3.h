@@ -1,6 +1,8 @@
 #ifndef SHA3_H
 #define SHA3_H
 
+#include <stdint.h>
+
 /* -------------------------------------------------------------------------
  * Works when compiled for either 32-bit or 64-bit targets, optimized for 
  * 64 bit.
@@ -28,7 +30,7 @@ typedef struct sha3_context_ {
     union {                     /* Keccak's state */
         uint64_t s[SHA3_KECCAK_SPONGE_WORDS];
         uint8_t sb[SHA3_KECCAK_SPONGE_WORDS * 8];
-    };
+    } u;
     unsigned byteIndex;         /* 0..7--the next byte after the set one
                                  * (starts from 0; 0--none are buffered) */
     unsigned wordIndex;         /* 0..24--the next word to integrate input
