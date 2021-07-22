@@ -60,7 +60,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "sha3.h"
+#include <sha3.h>
 
 int
 main()

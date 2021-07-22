@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <sys/mman.h>
 
-#include "sha3.h"
+#include <sha3.h>
 
 static void help(const char *argv0) {
     printf("To call: %s 256|384|512 [-k] file_path.\n", argv0);
@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
 {
     sha3_context c;
     const uint8_t *hash;
-    int image_size;
+    unsigned int image_size;
     const char *file_path;
     int fd;
     struct stat st;
@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
 	    return 1;
     }
 
-    image_size = atoi(argv[1]);
+    image_size = (unsigned int) strtoul(argv[1], NULL, 10);
     switch( image_size ) {
 	case 256:
 	case 384:
