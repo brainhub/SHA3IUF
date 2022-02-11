@@ -4,7 +4,7 @@ The purpose of this project is:
 
 * provide an API that hashes bytes, not bits
 * provide a simple reference implementation of a SHA-3 message digest algorithm, as defined in the [FIPS 202][fips202_standard] standard
-* assist developers in the [Etherium](https://www.ethereum.org/) blockchain ecosystem by providing the Keccak function used there
+* assist developers in the [Ethereum](https://www.ethereum.org/) blockchain ecosystem by providing the Keccak function used there
 * implement the hashing API that employs the __IUF__ paradigm (or `Init`, `Update`, `Finalize` style)
 * answer the design questions, such as:
   * what does the state for IUF look like?
