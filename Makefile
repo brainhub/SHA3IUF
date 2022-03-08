@@ -1,6 +1,6 @@
 .POSIX:
 CC = c99
-CFLAGS = -std=c99 -Wall -Wextra -Wpedantic -O2 -g
+CFLAGS = -I./include -std=c99 -Wall -Wextra -Wpedantic -O2 -g
 LDFLAGS =
 LDLIBS =
 PREFIX = /usr/local
@@ -11,26 +11,26 @@ all: libsha3.a sha3sum sha3test
 .c.o:
 	$(CC) -c $(CFLAGS) -o $@ $<
 
-libsha3.a: sha3.o
-	ar rsv $@ sha3.o
+libsha3.a: ./src/sha3.o
+	ar rsv $@ ./src/sha3.o
 
-sha3sum: sha3.o sha3sum.o
-	$(CC) $(LDFLAGS) -o $@ sha3.o sha3sum.o $(LDLIBS)
+sha3sum: ./src/sha3.o ./src/sha3sum.o
+	$(CC) $(LDFLAGS) -o $@ ./src/sha3.o ./src/sha3sum.o $(LDLIBS)
 
-sha3test: sha3.o sha3test.o
-	$(CC) $(LDFLAGS) -o $@ sha3.o sha3test.o $(LDLIBS)
+sha3test: ./src/sha3.o ./src/sha3test.o
+	$(CC) $(LDFLAGS) -o $@ ./src/sha3.o ./src/sha3test.o $(LDLIBS)
 
 check: sha3test
 	./sha3test
 
 clean:
-	rm -f *.o libsha3.a sha3sum sha3test
+	rm -f ./src/*.o libsha3.a sha3sum sha3test
 
 install:
 	mkdir -p $(DESTDIR)$(PREFIX)/include \
 		$(DESTDIR)$(PREFIX)/lib \
 		$(DESTDIR)$(PREFIX)/bin
-	install sha3.h $(DESTDIR)$(PREFIX)/include
+	install ./include/sha3.h $(DESTDIR)$(PREFIX)/include
 	install -m 755 libsha3.a $(DESTDIR)$(PREFIX)/lib
 	install -m 755 sha3sum $(DESTDIR)$(PREFIX)/bin
 
