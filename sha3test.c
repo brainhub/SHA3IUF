@@ -67,7 +67,7 @@ main()
 {
     uint8_t buf[200];
     sha3_context c;
-    const uint8_t *hash;
+    const void *hash;
     unsigned i;
     const uint8_t c1 = 0xa3;
 

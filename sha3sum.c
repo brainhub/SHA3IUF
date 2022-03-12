@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
 {
     sha3_context c;
     const uint8_t *hash;
-    int image_size;
+    unsigned image_size;
     const char *file_path;
     int fd;
     struct stat st;

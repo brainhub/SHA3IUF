@@ -116,6 +116,12 @@ This corresponds to the result obtained in Solidity JavaScript test framework.
 
 See [`sha3.h`](sha3.h) for the exact interface.
 
+## API fuzzing
+
+    $ fuzz/run.sh
+
+The fuzzing script expects clang installed.
+
 ## Credits
 
 Thanks to @ralight for moving the test code into separate `sha3test.c`

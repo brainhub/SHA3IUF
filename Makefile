@@ -17,6 +17,9 @@ libsha3.a: sha3.o
 sha3sum: sha3.o sha3sum.o
 	$(CC) $(LDFLAGS) -o $@ sha3.o sha3sum.o $(LDLIBS)
 
+sha3fuzz: sha3.c fuzz/sha3fuzz.c
+	clang -g --std=c99 -fsanitize=fuzzer,address -O0 -I . -o $@ $^
+
 sha3test: sha3.o sha3test.o
 	$(CC) $(LDFLAGS) -o $@ sha3.o sha3test.o $(LDLIBS)
 
@@ -24,7 +27,7 @@ check: sha3test
 	./sha3test
 
 clean:
-	rm -f *.o libsha3.a sha3sum sha3test
+	rm -f *.o libsha3.a sha3sum sha3test sha3fuzz
 
 install:
 	mkdir -p $(DESTDIR)$(PREFIX)/include \
