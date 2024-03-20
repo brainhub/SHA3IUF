@@ -57,13 +57,12 @@
  */
 
 #include <stdio.h>
-#include <stdint.h>
 #include <string.h>
 
-#include "sha3.h"
+#include "sha3iuf/sha3.h"
 
 int
-main()
+main(void)
 {
     uint8_t buf[200];
     sha3_context c;
@@ -372,3 +371,4 @@ main()
 
     return 0;
 }
+

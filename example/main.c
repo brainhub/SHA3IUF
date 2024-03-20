@@ -11,7 +11,6 @@
  * ---------------------------------------------------------------------- */
 
 #include <stdio.h>
-#include <stdint.h>
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -22,7 +21,7 @@
 #include <stdlib.h>
 #include <sys/mman.h>
 
-#include "sha3.h"
+#include "sha3iuf/sha3.h"
 
 static void help(const char *argv0) {
     printf("To call: %s 256|384|512 [-k] file_path.\n", argv0);
@@ -136,3 +135,4 @@ int main(int argc, char *argv[])
 
     return 0;
 }
+

@@ -1,7 +1,11 @@
-#ifndef SHA3_H
-#define SHA3_H
+#pragma once
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include <stdint.h>
+#include <stddef.h>
 
 /* -------------------------------------------------------------------------
  * Works when compiled for either 32-bit or 64-bit targets, optimized for 
@@ -70,4 +74,6 @@ sha3_return_t sha3_HashBuffer(
     const void *in, unsigned inBytes, 
     void *out, unsigned outBytes );     /* up to bitSize/8; truncation OK */
 
+#ifdef __cplusplus
+}
 #endif

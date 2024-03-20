@@ -1,46 +1,40 @@
-.POSIX:
-CC = c99
-CFLAGS = -std=c99 -Wall -Wextra -Wpedantic -O2 -g
-LDFLAGS =
-LDLIBS =
-PREFIX = /usr/local
+.PHONY: build-static-lib-debug
+build-static-lib-debug:
+	cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Debug
+	cmake --build build
 
-all: libsha3.a sha3sum sha3test
+.PHONY: build-static-lib-release
+build-static-lib-release:
+	cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release
+	cmake --build build
 
-.SUFFIXES: .c .o
-.c.o:
-	$(CC) -c $(CFLAGS) -o $@ $<
+.PHONY: build-shared-lib-debug
+build-shared-lib-debug:
+	cmake -S. -Bbuild -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Debug
+	cmake --build build
 
-libsha3.a: sha3.o
-	ar rsv $@ sha3.o
+.PHONY: build-shared-lib-release
+build-shared-lib-release:
+	cmake -S. -Bbuild -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Release
+	cmake --build build
 
-sha3sum: sha3.o sha3sum.o
-	$(CC) $(LDFLAGS) -o $@ sha3.o sha3sum.o $(LDLIBS)
+.PHONY: build-example
+build-example:
+	cmake -S. -Bbuild -DBUILD_EXAMPLE=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo
+	cmake --build build
 
-sha3fuzz: sha3.c fuzz/sha3fuzz.c
-	clang -g --std=c99 -fsanitize=fuzzer,address -O0 -I . -o $@ $^
+.PHONY: test
+test:
+	cmake -S. -Bbuild -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo
+	cmake --build build
+	./build/test/sha3iuf_test
 
-sha3test: sha3.o sha3test.o
-	$(CC) $(LDFLAGS) -o $@ sha3.o sha3test.o $(LDLIBS)
+.PHONY: run-fuzzer
+run-fuzzer:
+	cmake -S. -Bbuild -DBUILD_FUZZER=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo
+	cmake --build build
+	./build/test/sha3iuf_fuzz ./fuzz/seeds -max_total_time=100
 
-check: sha3test
-	./sha3test
-
+.PHONY: clean
 clean:
-	rm -f *.o libsha3.a sha3sum sha3test sha3fuzz
-
-install:
-	mkdir -p $(DESTDIR)$(PREFIX)/include \
-		$(DESTDIR)$(PREFIX)/lib \
-		$(DESTDIR)$(PREFIX)/bin
-	install sha3.h $(DESTDIR)$(PREFIX)/include
-	install -m 755 libsha3.a $(DESTDIR)$(PREFIX)/lib
-	install -m 755 sha3sum $(DESTDIR)$(PREFIX)/bin
-
-uninstall:
-	rm -f \
-		$(DESTDIR)$(PREFIX)/include/sha3.h \
-		$(DESTDIR)$(PREFIX)/lib/libsha3.a \
-		$(DESTDIR)$(PREFIX)/bin/sha3sum
-
-.PHONY: all check clean install uninstall
+	rm -rf build

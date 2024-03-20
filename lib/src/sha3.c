@@ -16,11 +16,9 @@
  * Aug 2015. Andrey Jivsov. crypto@brainhub.org
  * ---------------------------------------------------------------------- */
 
-#include <stdio.h>
-#include <stdint.h>
 #include <string.h>
 
-#include "sha3.h"
+#include "sha3iuf/sha3.h"
 
 #define SHA3_ASSERT( x )
 #define SHA3_TRACE( format, ...)
@@ -164,7 +162,7 @@ sha3_Update(void *priv, void const *bufIn, size_t len)
 
     size_t words;
     unsigned tail;
-    size_t i;
+    uint32_t i;
 
     const uint8_t *buf = bufIn;
 
