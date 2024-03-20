@@ -78,7 +78,7 @@ Include this project somewhere in your project (like `ext/SHA3IUF`) and add this
 ## Testing & Fuzzing
 
     // Run tests
-    $ make clean run-tests
+    $ make clean test
 
     // Run fuzzer (powered by [LibFuzzer](https://llvm.org/docs/LibFuzzer.html))
     $ make clean run-fuzzer

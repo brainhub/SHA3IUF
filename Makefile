@@ -23,8 +23,8 @@ build-example:
 	cmake -S. -Bbuild -DBUILD_EXAMPLE=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo
 	cmake --build build
 
-.PHONY: run-tests
-run-tests:
+.PHONY: test
+test:
 	cmake -S. -Bbuild -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo
 	cmake --build build
 	./build/test/sha3iuf_test

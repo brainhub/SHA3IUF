@@ -153,14 +153,14 @@ sha3_SetFlags(void *priv, enum SHA3_FLAGS flags)
 
 
 void
-sha3_Update(void *priv, void const *bufIn, uint32_t len)
+sha3_Update(void *priv, void const *bufIn, size_t len)
 {
     sha3_context *ctx = (sha3_context *) priv;
 
     /* 0...7 -- how much is needed to have a word */
     unsigned old_tail = (8 - ctx->byteIndex) & 7;
 
-    uint32_t words;
+    size_t words;
     unsigned tail;
     uint32_t i;
 

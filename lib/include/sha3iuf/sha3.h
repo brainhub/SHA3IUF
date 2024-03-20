@@ -5,6 +5,7 @@ extern "C" {
 #endif
 
 #include <stdint.h>
+#include <stddef.h>
 
 /* -------------------------------------------------------------------------
  * Works when compiled for either 32-bit or 64-bit targets, optimized for 
@@ -62,7 +63,7 @@ void sha3_Init512(void *priv);
 
 enum SHA3_FLAGS sha3_SetFlags(void *priv, enum SHA3_FLAGS);
 
-void sha3_Update(void *priv, void const *bufIn, uint32_t len);
+void sha3_Update(void *priv, void const *bufIn, size_t len);
 
 void const *sha3_Finalize(void *priv);
 
