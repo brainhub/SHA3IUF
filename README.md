@@ -11,7 +11,7 @@ The purpose of this project is:
   * how small can the state be (224 bytes on a 64-bit system for a unified SHA-3 algorithm)
   * what is the incremental cost of adding e.g. SHA3-384 to a SHA3-256 implementation?
 
-The implementation is written in C and uses `uint64_t` types to manage the SHA-3 state. The code will compile and run on 64-bit and 32-bit architectures (`gcc` and `gcc -m32` on `x86_64` were tested).
+The implementation is written in C and uses `uint64_t` types to manage the SHA-3 state. The code will compile and run on 64-bit and 32-bit architectures.
 
 [fips202_standard]: http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.202.pdf "FIPS 202 standard"
 
@@ -25,7 +25,7 @@ This is a clean-room implementation of IUF API for SHA3. The `keccakf()` is base
 
 ## Overview of the API
 
-Let's hash 'abc' with SHA3-256 using two methods: single buffer (but using IUF paradigm), and using the IUF API. 
+Let's hash 'abc' with SHA3-256 using two methods: single buffer (but using IUF paradigm), and using the IUF API.
 
     sha3_context c;
     uint8_t *hash;
@@ -58,36 +58,48 @@ There is also a single-call hashing API:
 
 Call `sha3_SetFlags(&c, SHA3_FLAGS_KECCAK)` immediately after `sha3_InitX` or no later than `sha3_Finalize`. This change cannot be undone for the given hash context.
 
-## Building
+## Building the library
 
-    $ make
+    // Builds a static library (change 'release' to 'debug' when developing)
+    $ make clean build-static-lib-release
 
-See `Makefile` for details. See also below for specific examples.
+    // Builds a shared library (change 'release' to 'debug' when developing)
+    $ make clean build-shared-lib-release
 
-## Self-tests
+## Linking with CMake
 
-    $ make test
-    Keccak-256 tests passed OK
-    SHA3-256, SHA3-384, SHA3-512 tests passed OK
+Include this project somewhere in your project (like `ext/SHA3IUF`) and add this to your `CMakeLists.txt`:
 
-or 
+    add_subdirectory(ext/SHA3IUF)
 
-    $ make CFLAGS=-m32 LDFLAGS=-m32 test
-    Keccak-256 tests passed OK
-    SHA3-256, SHA3-384, SHA3-512 tests passed OK
+    // Then link it to a target with
+    target_link_libraries(${PROJECT_NAME} sha3iuf_lib)
+
+## Testing & Fuzzing
+
+    // Run tests
+    $ make clean run-tests
+
+    // Run fuzzer (powered by [LibFuzzer](https://llvm.org/docs/LibFuzzer.html))
+    $ make clean run-fuzzer
+
+## Example Project
 
 There is also `sha3sum` test program that takes following parameters:
 
-    sha3sum 256|384|512 file_path 
+    sha3sum 256|384|512 file_path
 
 or for Keccak version:
 
-    sha3sum 256|384|512 -k file_path 
+    sha3sum 256|384|512 -k file_path
+
+Build it with `make clean build-example`
 
 ### SHA-3 / Linux sha3sum example
 
     $ touch empty.txt
-    $ gcc -Wall sha3.c sha3sum.c -o sha3sum && ./sha3sum 256 empty.txt
+    $ make clean build-example
+    $ ./build/example/sha3iuf_example 256 empty.txt
     a7ffc6f8bf1ed76651c14756a061d662f580ff4de43b49fa82d80a4b80f8434a  empty.txt
 
 Compare with Linux `sha3sum`:
@@ -115,12 +127,6 @@ This corresponds to the result obtained in Solidity JavaScript test framework.
 * `sha3_InitX` also works as Reset (zeroization) of the hash context; no Free function is needed;
 
 See [`sha3.h`](sha3.h) for the exact interface.
-
-## API fuzzing
-
-    $ fuzz/run.sh
-
-The fuzzing script expects clang installed.
 
 ## Credits
 

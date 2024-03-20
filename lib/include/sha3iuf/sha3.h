@@ -1,5 +1,8 @@
-#ifndef SHA3_H
-#define SHA3_H
+#pragma once
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include <stdint.h>
 
@@ -59,7 +62,7 @@ void sha3_Init512(void *priv);
 
 enum SHA3_FLAGS sha3_SetFlags(void *priv, enum SHA3_FLAGS);
 
-void sha3_Update(void *priv, void const *bufIn, size_t len);
+void sha3_Update(void *priv, void const *bufIn, uint32_t len);
 
 void const *sha3_Finalize(void *priv);
 
@@ -70,4 +73,6 @@ sha3_return_t sha3_HashBuffer(
     const void *in, unsigned inBytes, 
     void *out, unsigned outBytes );     /* up to bitSize/8; truncation OK */
 
+#ifdef __cplusplus
+}
 #endif

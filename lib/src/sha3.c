@@ -16,11 +16,9 @@
  * Aug 2015. Andrey Jivsov. crypto@brainhub.org
  * ---------------------------------------------------------------------- */
 
-#include <stdio.h>
-#include <stdint.h>
 #include <string.h>
 
-#include "sha3.h"
+#include "sha3iuf/sha3.h"
 
 #define SHA3_ASSERT( x )
 #define SHA3_TRACE( format, ...)
@@ -155,16 +153,16 @@ sha3_SetFlags(void *priv, enum SHA3_FLAGS flags)
 
 
 void
-sha3_Update(void *priv, void const *bufIn, size_t len)
+sha3_Update(void *priv, void const *bufIn, uint32_t len)
 {
     sha3_context *ctx = (sha3_context *) priv;
 
     /* 0...7 -- how much is needed to have a word */
     unsigned old_tail = (8 - ctx->byteIndex) & 7;
 
-    size_t words;
+    uint32_t words;
     unsigned tail;
-    size_t i;
+    uint32_t i;
 
     const uint8_t *buf = bufIn;
 
