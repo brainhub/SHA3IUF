@@ -28,7 +28,7 @@ static void help(const char *argv0) {
     printf("To call: %s 256|384|512 [-k] file_path.\n", argv0);
 }
 
-static void byte_to_hex(uint8_t b, char s[23]) {
+static void byte_to_hex(uint8_t b, char s[3]) {
     unsigned i=1;
     s[0] = s[1] = '0';
     s[2] = '\0';
