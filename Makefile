@@ -5,6 +5,8 @@ ARFLAGS = rsv
 CFLAGS = -std=c99 -Wall -Wextra -Wpedantic -O2 -g
 LDFLAGS =
 LDLIBS =
+FUZZ_CC = clang
+FUZZ_CFLAGS = -std=c99 -g -O1 -fsanitize=fuzzer,address,undefined
 PREFIX = /usr/local
 
 all: libsha3.a sha3sum sha3test
@@ -13,6 +15,8 @@ all: libsha3.a sha3sum sha3test
 .c.o:
 	$(CC) -c $(CFLAGS) -o $@ $<
 
+sha3.o sha3sum.o sha3test.o: sha3.h
+
 libsha3.a: sha3.o
 	$(AR) $(ARFLAGS) $@ sha3.o
 
@@ -20,7 +24,7 @@ sha3sum: sha3.o sha3sum.o
 	$(CC) $(LDFLAGS) -o $@ sha3.o sha3sum.o $(LDLIBS)
 
 sha3fuzz: sha3.c fuzz/sha3fuzz.c
-	clang -g --std=c99 -fsanitize=fuzzer,address -O0 -I . -o $@ $^
+	$(FUZZ_CC) $(FUZZ_CFLAGS) -I . -o $@ sha3.c fuzz/sha3fuzz.c
 
 sha3fuzztest: sha3.o sha3fuzz.o sha3fuzztest.o
 	$(CC) $(LDFLAGS) -o $@ sha3.o sha3fuzz.o sha3fuzztest.o $(LDLIBS)
@@ -44,7 +48,7 @@ test: check
 clean:
 	rm -f *.o libsha3.a sha3sum sha3test sha3fuzz sha3fuzztest
 
-install:
+install: libsha3.a sha3sum
 	mkdir -p $(DESTDIR)$(PREFIX)/include \
 		$(DESTDIR)$(PREFIX)/lib \
 		$(DESTDIR)$(PREFIX)/bin

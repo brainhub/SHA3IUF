@@ -73,9 +73,9 @@ See `Makefile` for details. See also below for specific examples.
     sha3sum tests passed OK
     Fuzz differential tests passed OK
 
-or 
+or
 
-    $ make CFLAGS=-m32 LDFLAGS=-m32 test
+    $ make CFLAGS="-std=c99 -Wall -Wextra -Wpedantic -O2 -g -m32" LDFLAGS=-m32 test
     Keccak-224 tests passed OK
     Keccak-256 tests passed OK
     SHA3-224, SHA3-256, SHA3-384, SHA3-512 tests passed OK
@@ -129,6 +129,7 @@ See [`sha3.h`](sha3.h) for the exact interface.
     $ fuzz/run.sh
 
 The fuzzing script expects a Clang installation that includes the libFuzzer runtime.
+Set `FUZZ_CC` to select a different Clang installation, and set `FUZZ_SECONDS` to change the script's 100-second default.
 
 ## Credits
 
