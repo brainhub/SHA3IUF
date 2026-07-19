@@ -56,14 +56,14 @@
  *
  */
 
+#include "sha3.h"
+
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
 
-#include "sha3.h"
-
 int
-main()
+main(void)
 {
     uint8_t buf[200];
     sha3_context c;
@@ -102,6 +102,40 @@ main()
         0xe5, 0x89, 0xc5, 0x1c, 0xa1, 0xa4, 0xa8, 0x41,
         0x6d, 0xf6, 0x54, 0x5a, 0x1c, 0xe8, 0xba, 0x00
     };
+
+    if(sha3_Init(&c, 123) != SHA3_RETURN_BAD_PARAMS) {
+        printf("sha3_Init accepted an unsupported hash size\n");
+        return 20;
+    }
+
+    memset(buf, 0xa5, sizeof(buf));
+    if(sha3_HashBuffer(123, SHA3_FLAGS_NONE, "", 0, buf, sizeof(buf)) !=
+            SHA3_RETURN_BAD_PARAMS || buf[0] != 0xa5) {
+        printf("sha3_HashBuffer accepted an unsupported hash size\n");
+        return 21;
+    }
+
+    if(sha3_HashBuffer(256, (enum SHA3_FLAGS)2, "", 0, buf,
+                sizeof(buf)) != SHA3_RETURN_BAD_PARAMS || buf[0] != 0xa5) {
+        printf("sha3_HashBuffer accepted unsupported flags\n");
+        return 22;
+    }
+
+    if(sha3_HashBuffer(256, SHA3_FLAGS_NONE, "", 0, buf, 16) !=
+            SHA3_RETURN_OK || memcmp(buf, sha3_256_empty, 16) != 0 ||
+            buf[16] != 0xa5) {
+        printf("sha3_HashBuffer truncation failed\n");
+        return 23;
+    }
+
+    memset(buf, 0xa5, sizeof(buf));
+    if(sha3_HashBuffer(256, SHA3_FLAGS_NONE, "", 0, buf, sizeof(buf)) !=
+            SHA3_RETURN_OK || memcmp(buf, sha3_256_empty,
+                sizeof(sha3_256_empty)) != 0 ||
+            buf[sizeof(sha3_256_empty)] != 0xa5) {
+        printf("sha3_HashBuffer output limit failed\n");
+        return 24;
+    }
 
     /* ---- "pure" Keccak algorithm begins; from [Keccak] ----- */
 

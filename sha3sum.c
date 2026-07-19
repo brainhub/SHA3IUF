@@ -13,14 +13,11 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
+#include <errno.h>
+#include <limits.h>
 #include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <fcntl.h>
 #include <stdlib.h>
-#include <sys/mman.h>
 
 #include "sha3.h"
 
@@ -28,7 +25,7 @@ static void help(const char *argv0) {
     printf("To call: %s 256|384|512 [-k] file_path.\n", argv0);
 }
 
-static void byte_to_hex(uint8_t b, char s[23]) {
+static void byte_to_hex(uint8_t b, char s[3]) {
     unsigned i=1;
     s[0] = s[1] = '0';
     s[2] = '\0';
@@ -51,17 +48,26 @@ int main(int argc, char *argv[])
     unsigned image_size;
     const char *file_path;
     int fd;
-    struct stat st;
-    void *p;
+    uint8_t buffer[32768];
+    ssize_t bytes_read;
     unsigned i;
     unsigned use_keccak = 0;
+    char *end;
+    unsigned long parsed_size;
 
     if( argc != 3 && argc != 4 ) {
 	    help(argv[0]);
 	    return 1;
     }
 
-    image_size = atoi(argv[1]);
+    errno = 0;
+    parsed_size = strtoul(argv[1], &end, 10);
+    if( errno == ERANGE || end == argv[1] || *end != '\0' ||
+            parsed_size > UINT_MAX ) {
+        help(argv[0]);
+        return 1;
+    }
+    image_size = (unsigned)parsed_size;
     switch( image_size ) {
 	case 256:
 	case 384:
@@ -74,58 +80,52 @@ int main(int argc, char *argv[])
 
     file_path = argv[2];
 
-    if( argc == 4 && file_path[0] == '-' && file_path[1] == 'k' )  {
+    if( argc == 4 && strcmp(file_path, "-k") == 0 )  {
         use_keccak = 1;
         file_path = argv[3];
     }
-
-    if( access(file_path, R_OK)!=0 ) {
-	    printf("Cannot read file '%s'", file_path);
-	    return 2;
+    else if( argc == 4 ) {
+        help(argv[0]);
+        return 1;
     }
 
     fd = open(file_path, O_RDONLY);
     if( fd == -1 ) {
-	    printf("Cannot open file '%s' for reading", file_path);
-	    return 2;
-    }
-    i = fstat(fd, &st);
-    if( i ) {
-	    close(fd);
-	    printf("Cannot determine the size of file '%s'", file_path);
+	    fprintf(stderr, "Cannot open file '%s' for reading: %s\n",
+                    file_path, strerror(errno));
 	    return 2;
     }
 
-    p = mmap(NULL, st.st_size, PROT_READ, MAP_SHARED, fd, 0);
-    close(fd);
-    if( p==NULL ) {
-	    printf("Cannot memory-map file '%s'", file_path);
-	    return 2;
-    }
-
-    switch(image_size) {
-	case 256:
-    		sha3_Init256(&c);
-		break;
-	case 384:
-    		sha3_Init384(&c);
-		break;
-	case 512:
-    		sha3_Init512(&c);
-		break;
+    if( sha3_Init(&c, image_size) != SHA3_RETURN_OK ) {
+        close(fd);
+        fprintf(stderr, "Failed to initialize SHA3-%u\n", image_size);
+        return 2;
     }
 
     if( use_keccak ) {
         enum SHA3_FLAGS flags2 = sha3_SetFlags(&c, SHA3_FLAGS_KECCAK);
         if( flags2 != SHA3_FLAGS_KECCAK )  {
-	    printf("Failed to set Keccak mode");
+	    fprintf(stderr, "Failed to set Keccak mode\n");
+            close(fd);
             return 2;
         }
     }
-    sha3_Update(&c, p, st.st_size);
-    hash = sha3_Finalize(&c);
 
-    munmap(p, st.st_size);
+    while( (bytes_read = read(fd, buffer, sizeof(buffer))) > 0 )
+        sha3_Update(&c, buffer, (size_t)bytes_read);
+    if( bytes_read < 0 ) {
+        fprintf(stderr, "Cannot read file '%s': %s\n", file_path,
+                strerror(errno));
+        close(fd);
+        return 2;
+    }
+    if( close(fd) != 0 ) {
+        fprintf(stderr, "Cannot close file '%s': %s\n", file_path,
+                strerror(errno));
+        return 2;
+    }
+
+    hash = sha3_Finalize(&c);
 
     for(i=0; i<image_size/8; i++) {
 	    char s[3];

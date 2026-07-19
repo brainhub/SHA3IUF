@@ -25,8 +25,9 @@ sha3fuzz: sha3.c fuzz/sha3fuzz.c
 sha3test: sha3.o sha3test.o
 	$(CC) $(LDFLAGS) -o $@ sha3.o sha3test.o $(LDLIBS)
 
-check: sha3test
+check: sha3test sha3sum
 	./sha3test
+	./tests/sha3sumtest.sh ./sha3sum
 
 test: check
 
