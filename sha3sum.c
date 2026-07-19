@@ -3,7 +3,7 @@
  *
  * Call as
  *
- * sha3sum 256|384|512 file_path
+ * sha3sum 224|256|384|512 file_path
  *
  * See sha3.c for additional details. 
  *
@@ -22,7 +22,7 @@
 #include "sha3.h"
 
 static void help(const char *argv0) {
-    printf("To call: %s 256|384|512 [-k] file_path.\n", argv0);
+    printf("To call: %s 224|256|384|512 [-k] file_path.\n", argv0);
 }
 
 static void byte_to_hex(uint8_t b, char s[3]) {
@@ -69,6 +69,7 @@ int main(int argc, char *argv[])
     }
     image_size = (unsigned)parsed_size;
     switch( image_size ) {
+	case 224:
 	case 256:
 	case 384:
 	case 512:

@@ -10,7 +10,7 @@
  *
  * Canonical implementation of Init/Update/Finalize for SHA-3 byte input. 
  *
- * SHA3-256, SHA3-384, SHA-512 are implemented. SHA-224 can easily be added.
+ * SHA3-224, SHA3-256, SHA3-384, and SHA3-512 are implemented.
  *
  * Based on code from http://keccak.noekeon.org/ .
  *
@@ -54,6 +54,7 @@ typedef enum SHA3_RETURN sha3_return_t;
 /* For Init or Reset call these: */
 sha3_return_t sha3_Init(void *priv, unsigned bitSize);
 
+void sha3_Init224(void *priv);
 void sha3_Init256(void *priv);
 void sha3_Init384(void *priv);
 void sha3_Init512(void *priv);
@@ -66,7 +67,7 @@ void const *sha3_Finalize(void *priv);
 
 /* Single-call hashing */
 sha3_return_t sha3_HashBuffer( 
-    unsigned bitSize,   /* 256, 384, 512 */
+    unsigned bitSize,   /* 224, 256, 384, 512 */
     enum SHA3_FLAGS flags, /* SHA3_FLAGS_NONE or SHA3_FLAGS_KECCAK */
     const void *in, unsigned inBytes, 
     void *out, unsigned outBytes );     /* up to bitSize/8; truncation OK */

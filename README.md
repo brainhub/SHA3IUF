@@ -67,22 +67,28 @@ See `Makefile` for details. See also below for specific examples.
 ## Self-tests
 
     $ make test
+    Keccak-224 tests passed OK
     Keccak-256 tests passed OK
-    SHA3-256, SHA3-384, SHA3-512 tests passed OK
+    SHA3-224, SHA3-256, SHA3-384, SHA3-512 tests passed OK
+    sha3sum tests passed OK
+    Fuzz differential tests passed OK
 
 or 
 
     $ make CFLAGS=-m32 LDFLAGS=-m32 test
+    Keccak-224 tests passed OK
     Keccak-256 tests passed OK
-    SHA3-256, SHA3-384, SHA3-512 tests passed OK
+    SHA3-224, SHA3-256, SHA3-384, SHA3-512 tests passed OK
+    sha3sum tests passed OK
+    Fuzz differential tests passed OK
 
 There is also `sha3sum` test program that takes following parameters:
 
-    sha3sum 256|384|512 file_path 
+    sha3sum 224|256|384|512 file_path
 
 or for Keccak version:
 
-    sha3sum 256|384|512 -k file_path 
+    sha3sum 224|256|384|512 -k file_path
 
 ### SHA-3 / Linux sha3sum example
 
@@ -108,8 +114,8 @@ This corresponds to the result obtained in Solidity JavaScript test framework.
 
 ## API
 
-* the same `sha3_context` object maintains the state for SHA3-256, SHA3-384, or SHA3-512 algorithm;
-* the hash algorithm used is determined by how the context was initialized with `sha3_InitX`, e.g. `sha3_Init256`, `sha3_Init384`, or `sha3_Init512` call;
+* the same `sha3_context` object maintains the state for SHA3-224, SHA3-256, SHA3-384, or SHA3-512;
+* the hash algorithm used is determined by how the context was initialized with `sha3_InitX`, e.g. `sha3_Init224`, `sha3_Init256`, `sha3_Init384`, or `sha3_Init512`;
 * `sha3_Update` and `sha3_Finalize` are the same for regardless the type of the algorithm (`X`);
 * the buffer returned by `sha3_Finalize` will have `X` bits of hash;
 * `sha3_InitX` also works as Reset (zeroization) of the hash context; no Free function is needed;
@@ -118,9 +124,11 @@ See [`sha3.h`](sha3.h) for the exact interface.
 
 ## API fuzzing
 
+`make test` runs the fuzz entry point deterministically across every algorithm, padding mode, update strategy, and important block boundary. To run coverage-guided fuzzing with libFuzzer:
+
     $ fuzz/run.sh
 
-The fuzzing script expects clang installed.
+The fuzzing script expects a Clang installation that includes the libFuzzer runtime.
 
 ## Credits
 
@@ -128,9 +136,8 @@ Thanks to @ralight for moving the test code into separate `sha3test.c`
 
 ## Notes
 
-SHA3-224 is not supported, but can easily be added.
+All four fixed-output SHA-3 functions from FIPS 202 are supported: SHA3-224, SHA3-256, SHA3-384, and SHA3-512. Each can also use legacy Keccak padding with `SHA3_FLAGS_KECCAK`.
 
 The code was written to work with the Microsoft Visual Studio compiler (under `_MSC_VER`), but this build target was not tested.
 
 This project was created to support [SHA3 in OpenPGP](https://tools.ietf.org/html/draft-jivsov-openpgp-sha3) work, but it applies to other protocols and formats, e.g. TLS.
-
