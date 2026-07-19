@@ -2,3 +2,6 @@
 /*.a
 /sha3sum
 /sha3test
+/sha3fuzz
+/sha3fuzztest
+/*.dSYM/

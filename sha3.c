@@ -4,7 +4,7 @@
  *
  * Canonical implementation of Init/Update/Finalize for SHA-3 byte input. 
  *
- * SHA3-256, SHA3-384, SHA-512 are implemented. SHA-224 can easily be added.
+ * SHA3-224, SHA3-256, SHA3-384, and SHA3-512 are implemented.
  *
  * Based on code from http://keccak.noekeon.org/ .
  *
@@ -119,11 +119,17 @@ keccakf(uint64_t s[25])
 sha3_return_t
 sha3_Init(void *priv, unsigned bitSize) {
     sha3_context *ctx = (sha3_context *) priv;
-    if( bitSize != 256 && bitSize != 384 && bitSize != 512 )
+    if( bitSize != 224 && bitSize != 256 && bitSize != 384 && bitSize != 512 )
         return SHA3_RETURN_BAD_PARAMS;
     memset(ctx, 0, sizeof(*ctx));
     ctx->capacityWords = 2 * bitSize / (8 * sizeof(uint64_t));
     return SHA3_RETURN_OK;
+}
+
+void
+sha3_Init224(void *priv)
+{
+    sha3_Init(priv, 224);
 }
 
 void

@@ -4,7 +4,7 @@
  *
  * Canonical implementation of Init/Update/Finalize for SHA-3 byte input. 
  *
- * SHA3-256, SHA3-384, SHA-512 are implemented. SHA-224 can easily be added.
+ * SHA3-224, SHA3-256, SHA3-384, and SHA3-512 are implemented.
  *
  * Based on code from http://keccak.noekeon.org/ .
  *
@@ -25,6 +25,9 @@
  * Known answer tests are from NIST SHA3 test vectors at
  * http://csrc.nist.gov/groups/ST/toolkit/examples.html
  *
+ * SHA3-224:
+ *   http://csrc.nist.gov/groups/ST/toolkit/documents/Examples/SHA3-224_Msg0.pdf
+ *   http://csrc.nist.gov/groups/ST/toolkit/documents/Examples/SHA3-224_1600.pdf
  * SHA3-256:
  *   http://csrc.nist.gov/groups/ST/toolkit/documents/Examples/SHA3-256_Msg0.pdf
  *   http://csrc.nist.gov/groups/ST/toolkit/documents/Examples/SHA3-256_1600.pdf
@@ -56,14 +59,14 @@
  *
  */
 
+#include "sha3.h"
+
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
 
-#include "sha3.h"
-
 int
-main()
+main(void)
 {
     uint8_t buf[200];
     sha3_context c;
@@ -72,6 +75,54 @@ main()
     const uint8_t c1 = 0xa3;
 
     /* [FIPS 202] KAT follow */
+    static const uint8_t sha3_224_empty[224 / 8] = {
+        0x6b, 0x4e, 0x03, 0x42, 0x36, 0x67, 0xdb, 0xb7,
+        0x3b, 0x6e, 0x15, 0x45, 0x4f, 0x0e, 0xb1, 0xab,
+        0xd4, 0x59, 0x7f, 0x9a, 0x1b, 0x07, 0x8e, 0x3f,
+        0x5b, 0x5a, 0x6b, 0xc7
+    };
+    static const uint8_t sha3_224_abc[224 / 8] = {
+        0xe6, 0x42, 0x82, 0x4c, 0x3f, 0x8c, 0xf2, 0x4a,
+        0xd0, 0x92, 0x34, 0xee, 0x7d, 0x3c, 0x76, 0x6f,
+        0xc9, 0xa3, 0xa5, 0x16, 0x8d, 0x0c, 0x94, 0xad,
+        0x73, 0xb4, 0x6f, 0xdf
+    };
+    static const uint8_t sha3_224_0xa3_200_times[224 / 8] = {
+        0x93, 0x76, 0x81, 0x6a, 0xba, 0x50, 0x3f, 0x72,
+        0xf9, 0x6c, 0xe7, 0xeb, 0x65, 0xac, 0x09, 0x5d,
+        0xee, 0xe3, 0xbe, 0x4b, 0xf9, 0xbb, 0xc2, 0xa1,
+        0xcb, 0x7e, 0x11, 0xe0
+    };
+    static const uint8_t sha3_224_zero_143[224 / 8] = {
+        0xb6, 0xb7, 0x09, 0xfd, 0xb9, 0x85, 0x2b, 0x8c,
+        0x74, 0x39, 0xa3, 0x35, 0x95, 0xd4, 0x2d, 0xba,
+        0x29, 0x40, 0xf4, 0x4c, 0x10, 0xc3, 0xce, 0x09,
+        0xf8, 0xb6, 0xa8, 0x7a
+    };
+    static const uint8_t sha3_224_zero_144[224 / 8] = {
+        0xf2, 0xb8, 0x48, 0x6f, 0xce, 0xee, 0x2c, 0x6a,
+        0x11, 0xa6, 0x04, 0xce, 0x4e, 0xfe, 0x21, 0x7d,
+        0xa8, 0x54, 0x82, 0x9c, 0x2c, 0x2d, 0xcc, 0x9a,
+        0x23, 0x75, 0x8b, 0x4d
+    };
+    static const uint8_t sha3_224_zero_145[224 / 8] = {
+        0x36, 0x1c, 0xa4, 0x0d, 0xe4, 0x95, 0xe0, 0x3b,
+        0xd0, 0x91, 0x69, 0x4f, 0x1d, 0x13, 0x72, 0x85,
+        0x11, 0x05, 0x04, 0x6a, 0x1b, 0xf6, 0xd5, 0x9f,
+        0xaf, 0xe7, 0xd6, 0x68
+    };
+    static const uint8_t keccak_224_empty[224 / 8] = {
+        0xf7, 0x18, 0x37, 0x50, 0x2b, 0xa8, 0xe1, 0x08,
+        0x37, 0xbd, 0xd8, 0xd3, 0x65, 0xad, 0xb8, 0x55,
+        0x91, 0x89, 0x56, 0x02, 0xfc, 0x55, 0x2b, 0x48,
+        0xb7, 0x39, 0x0a, 0xbd
+    };
+    static const uint8_t keccak_224_abc[224 / 8] = {
+        0xc3, 0x04, 0x11, 0x76, 0x85, 0x06, 0xeb, 0xe1,
+        0xc2, 0x87, 0x1b, 0x1e, 0xe2, 0xe8, 0x7d, 0x38,
+        0xdf, 0x34, 0x23, 0x17, 0x30, 0x0a, 0x9b, 0x97,
+        0xa9, 0x5e, 0xc6, 0xa8
+    };
     static const uint8_t sha3_256_empty[256 / 8] = {
         0xa7, 0xff, 0xc6, 0xf8, 0xbf, 0x1e, 0xd7, 0x66,
 	0x51, 0xc1, 0x47, 0x56, 0xa0, 0x61, 0xd6, 0x62,
@@ -103,7 +154,63 @@ main()
         0x6d, 0xf6, 0x54, 0x5a, 0x1c, 0xe8, 0xba, 0x00
     };
 
+    if(sha3_Init(&c, 123) != SHA3_RETURN_BAD_PARAMS) {
+        printf("sha3_Init accepted an unsupported hash size\n");
+        return 20;
+    }
+
+    memset(buf, 0xa5, sizeof(buf));
+    if(sha3_HashBuffer(123, SHA3_FLAGS_NONE, "", 0, buf, sizeof(buf)) !=
+            SHA3_RETURN_BAD_PARAMS || buf[0] != 0xa5) {
+        printf("sha3_HashBuffer accepted an unsupported hash size\n");
+        return 21;
+    }
+
+    if(sha3_HashBuffer(256, (enum SHA3_FLAGS)2, "", 0, buf,
+                sizeof(buf)) != SHA3_RETURN_BAD_PARAMS || buf[0] != 0xa5) {
+        printf("sha3_HashBuffer accepted unsupported flags\n");
+        return 22;
+    }
+
+    if(sha3_HashBuffer(256, SHA3_FLAGS_NONE, "", 0, buf, 16) !=
+            SHA3_RETURN_OK || memcmp(buf, sha3_256_empty, 16) != 0 ||
+            buf[16] != 0xa5) {
+        printf("sha3_HashBuffer truncation failed\n");
+        return 23;
+    }
+
+    memset(buf, 0xa5, sizeof(buf));
+    if(sha3_HashBuffer(256, SHA3_FLAGS_NONE, "", 0, buf, sizeof(buf)) !=
+            SHA3_RETURN_OK || memcmp(buf, sha3_256_empty,
+                sizeof(sha3_256_empty)) != 0 ||
+            buf[sizeof(sha3_256_empty)] != 0xa5) {
+        printf("sha3_HashBuffer output limit failed\n");
+        return 24;
+    }
+
     /* ---- "pure" Keccak algorithm begins; from [Keccak] ----- */
+
+    memset(buf, 0xa5, sizeof(buf));
+    if(sha3_HashBuffer(224, SHA3_FLAGS_KECCAK, "abc", 3, buf,
+                sizeof(buf)) != SHA3_RETURN_OK ||
+            memcmp(buf, keccak_224_abc, sizeof(keccak_224_abc)) != 0 ||
+            buf[sizeof(keccak_224_abc)] != 0xa5) {
+        printf("Keccak-224(abc) doesn't match known answer\n");
+        return 30;
+    }
+
+    sha3_Init224(&c);
+    if(sha3_SetFlags(&c, SHA3_FLAGS_KECCAK) != SHA3_FLAGS_KECCAK) {
+        printf("Keccak-224 mode setup failed\n");
+        return 31;
+    }
+    hash = sha3_Finalize(&c);
+    if(memcmp(hash, keccak_224_empty, sizeof(keccak_224_empty)) != 0) {
+        printf("Keccak-224() doesn't match known answer\n");
+        return 32;
+    }
+
+    printf("Keccak-224 tests passed OK\n");
 
     sha3_HashBuffer(256, SHA3_FLAGS_KECCAK, "abc", 3, buf, sizeof(buf));
     if(memcmp(buf, "\x4e\x03\x65\x7a\xea\x45\xa9\x4f"
@@ -206,7 +313,109 @@ main()
 
     /* ----- SHA3 testing begins ----- */
 
-    /* SHA-256 on an empty buffer */
+    if(sha3_Init(&c, 224) != SHA3_RETURN_OK) {
+        printf("SHA3-224 generic initialization failed\n");
+        return 33;
+    }
+    hash = sha3_Finalize(&c);
+    if(memcmp(sha3_224_empty, hash, sizeof(sha3_224_empty)) != 0) {
+        printf("SHA3-224() doesn't match known answer\n");
+        return 34;
+    }
+
+    memset(buf, 0xa5, sizeof(buf));
+    if(sha3_HashBuffer(224, SHA3_FLAGS_NONE, "abc", 3, buf,
+                sizeof(buf)) != SHA3_RETURN_OK ||
+            memcmp(buf, sha3_224_abc, sizeof(sha3_224_abc)) != 0 ||
+            buf[sizeof(sha3_224_abc)] != 0xa5) {
+        printf("SHA3-224(abc) doesn't match known answer\n");
+        return 35;
+    }
+
+    memset(buf, c1, sizeof(buf));
+
+    /* SHA3-224 as a single buffer. [FIPS 202] */
+    sha3_Init224(&c);
+    sha3_Update(&c, buf, sizeof(buf));
+    hash = sha3_Finalize(&c);
+    if(memcmp(sha3_224_0xa3_200_times, hash,
+                    sizeof(sha3_224_0xa3_200_times)) != 0) {
+        printf("SHA3-224( 0xa3 ... [200 times] ) "
+                "doesn't match known answer (1 buffer)\n");
+        return 36;
+    }
+
+    /* SHA3-224 split across partial words and its rate boundary. */
+    sha3_Init224(&c);
+    sha3_Update(&c, buf, 73);
+    sha3_Update(&c, buf + 73, sizeof(buf) - 73);
+    hash = sha3_Finalize(&c);
+    if(memcmp(sha3_224_0xa3_200_times, hash,
+                    sizeof(sha3_224_0xa3_200_times)) != 0) {
+        printf("SHA3-224( 0xa3 ... [200 times] ) "
+                "doesn't match known answer (2 steps)\n");
+        return 37;
+    }
+
+    /* SHA3-224 byte-by-byte. [FIPS 202] */
+    i = 200;
+    sha3_Init224(&c);
+    while (i--)
+        sha3_Update(&c, &c1, 1);
+    hash = sha3_Finalize(&c);
+    if(memcmp(sha3_224_0xa3_200_times, hash,
+                    sizeof(sha3_224_0xa3_200_times)) != 0) {
+        printf("SHA3-224( 0xa3 ... [200 times] ) "
+                "doesn't match known answer (200 steps)\n");
+        return 38;
+    }
+
+    memset(buf, 0, sizeof(buf));
+
+    sha3_Init224(&c);
+    sha3_Update(&c, buf, 143);
+    hash = sha3_Finalize(&c);
+    if(memcmp(sha3_224_zero_143, hash, sizeof(sha3_224_zero_143)) != 0) {
+        printf("SHA3-224 rate-minus-one test failed\n");
+        return 39;
+    }
+
+    sha3_Init224(&c);
+    sha3_Update(&c, buf, 137);
+    sha3_Update(&c, buf + 137, 7);
+    hash = sha3_Finalize(&c);
+    if(memcmp(sha3_224_zero_144, hash, sizeof(sha3_224_zero_144)) != 0) {
+        printf("SHA3-224 rate-boundary test failed\n");
+        return 40;
+    }
+
+    sha3_Init224(&c);
+    sha3_Update(&c, buf, 144);
+    sha3_Update(&c, buf + 144, 1);
+    hash = sha3_Finalize(&c);
+    if(memcmp(sha3_224_zero_145, hash, sizeof(sha3_224_zero_145)) != 0) {
+        printf("SHA3-224 rate-plus-one test failed\n");
+        return 41;
+    }
+
+    memset(buf, 0xa5, sizeof(buf));
+    if(sha3_HashBuffer(224, SHA3_FLAGS_NONE, "", 0, buf, 27) !=
+            SHA3_RETURN_OK || memcmp(buf, sha3_224_empty, 27) != 0 ||
+            buf[27] != 0xa5) {
+        printf("SHA3-224 truncation failed\n");
+        return 42;
+    }
+
+    memset(buf, 0xa5, sizeof(buf));
+    if(sha3_HashBuffer(224, SHA3_FLAGS_NONE, "", 0, buf, sizeof(buf)) !=
+            SHA3_RETURN_OK || memcmp(buf, sha3_224_empty,
+                sizeof(sha3_224_empty)) != 0 ||
+            buf[sizeof(sha3_224_empty)] != 0xa5) {
+        printf("SHA3-224 output limit failed\n");
+        return 43;
+    }
+
+    /* SHA3-256 on an empty buffer */
     sha3_Init256(&c);
     hash = sha3_Finalize(&c);
     if(memcmp(sha3_256_empty, hash, sizeof(sha3_256_empty)) != 0) {
@@ -368,7 +577,7 @@ main()
         return 10;
     }
 
-    printf("SHA3-256, SHA3-384, SHA3-512 tests passed OK\n");
+    printf("SHA3-224, SHA3-256, SHA3-384, SHA3-512 tests passed OK\n");
 
     return 0;
 }
