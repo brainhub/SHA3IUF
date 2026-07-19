@@ -1,5 +1,7 @@
 .POSIX:
-CC = c99
+CC = cc
+AR = ar
+ARFLAGS = rsv
 CFLAGS = -std=c99 -Wall -Wextra -Wpedantic -O2 -g
 LDFLAGS =
 LDLIBS =
@@ -12,7 +14,7 @@ all: libsha3.a sha3sum sha3test
 	$(CC) -c $(CFLAGS) -o $@ $<
 
 libsha3.a: sha3.o
-	ar rsv $@ sha3.o
+	$(AR) $(ARFLAGS) $@ sha3.o
 
 sha3sum: sha3.o sha3sum.o
 	$(CC) $(LDFLAGS) -o $@ sha3.o sha3sum.o $(LDLIBS)
@@ -26,6 +28,8 @@ sha3test: sha3.o sha3test.o
 check: sha3test
 	./sha3test
 
+test: check
+
 clean:
 	rm -f *.o libsha3.a sha3sum sha3test sha3fuzz
 
@@ -33,8 +37,8 @@ install:
 	mkdir -p $(DESTDIR)$(PREFIX)/include \
 		$(DESTDIR)$(PREFIX)/lib \
 		$(DESTDIR)$(PREFIX)/bin
-	install sha3.h $(DESTDIR)$(PREFIX)/include
-	install -m 755 libsha3.a $(DESTDIR)$(PREFIX)/lib
+	install -m 644 sha3.h $(DESTDIR)$(PREFIX)/include
+	install -m 644 libsha3.a $(DESTDIR)$(PREFIX)/lib
 	install -m 755 sha3sum $(DESTDIR)$(PREFIX)/bin
 
 uninstall:
@@ -43,4 +47,4 @@ uninstall:
 		$(DESTDIR)$(PREFIX)/lib/libsha3.a \
 		$(DESTDIR)$(PREFIX)/bin/sha3sum
 
-.PHONY: all check clean install uninstall
+.PHONY: all check test clean install uninstall
